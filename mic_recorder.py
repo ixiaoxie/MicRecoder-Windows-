@@ -56,6 +56,8 @@ TRANSLATIONS = {
         "tray_exit": "Exit",
         "title_setup": "Mic Recorder Setup",
         "lbl_language": "Language / 语言:",
+        "lbl_controls": "Controls",
+        "lbl_settings": "Settings",
         "msg_exit_title": "Exit Application",
         "msg_exit_body": "Do you want to minimize to the system tray instead of exiting?\n\nYes = Minimize to Tray\nNo = Exit Application\nCancel = Stay Open",
         "msg_hotkey_conflict_title": "Hotkey Conflict",
@@ -87,6 +89,8 @@ TRANSLATIONS = {
         "tray_exit": "退出",
         "title_setup": "麦克风录音设置",
         "lbl_language": "Language / 语言:",
+        "lbl_controls": "控制",
+        "lbl_settings": "设置",
         "msg_exit_title": "退出程序",
         "msg_exit_body": "您希望最小化到系统托盘而不是退出吗？\n\n是 (Yes) = 最小化\n否 (No) = 退出程序\n取消 (Cancel) = 取消操作",
         "msg_hotkey_conflict_title": "热键冲突",
@@ -450,24 +454,25 @@ class MainApp(tk.Tk):
         self.lbl_status.pack(pady=5)
 
         # Controls Group
-        group_controls = ttk.LabelFrame(self, text=" Controls ", padding=(20, 10))
-        group_controls.pack(fill="x", padx=20, pady=10)
+        self.group_controls = ttk.LabelFrame(self, text=f" {self.tr('lbl_controls')} ", padding=(20, 10))
+        self.group_controls.pack(fill="x", padx=20, pady=10)
 
-        self.btn_toggle = ttk.Button(group_controls, text=self.tr("btn_toggle"), command=lambda: self.recorder.toggle_recording())
+        self.btn_toggle = ttk.Button(self.group_controls, text=self.tr("btn_toggle"), command=lambda: self.recorder.toggle_recording())
         self.btn_toggle.pack(side="left", fill="x", expand=True, padx=5)
 
-        self.btn_stop = ttk.Button(group_controls, text=self.tr("btn_stop"), command=lambda: self.recorder.stop(), state="disabled")
+        self.btn_stop = ttk.Button(self.group_controls, text=self.tr("btn_stop"), command=lambda: self.recorder.stop(), state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True, padx=5)
 
         # Settings Group
-        group_settings = ttk.LabelFrame(self, text=" Settings ", padding=(20, 10))
-        group_settings.pack(fill="x", padx=20, pady=10)
+        self.group_settings = ttk.LabelFrame(self, text=f" {self.tr('lbl_settings')} ", padding=(20, 10))
+        self.group_settings.pack(fill="x", padx=20, pady=10)
 
         # Volume
-        ttk.Label(group_settings, text=self.tr("lbl_volume")).pack(anchor="w")
+        self.lbl_volume = ttk.Label(self.group_settings, text=self.tr("lbl_volume"))
+        self.lbl_volume.pack(anchor="w")
         self.vol_var = tk.DoubleVar(value=self.config.get("volume"))
         
-        frame_vol = ttk.Frame(group_settings)
+        frame_vol = ttk.Frame(self.group_settings)
         frame_vol.pack(fill="x", pady=5)
         self.scale_vol = ttk.Scale(frame_vol, from_=0.1, to=5.0, variable=self.vol_var, command=self.on_volume_change)
         self.scale_vol.pack(side="left", fill="x", expand=True, padx=(0, 10))
@@ -475,8 +480,9 @@ class MainApp(tk.Tk):
         self.lbl_vol_val.pack(side="right")
 
         # Save Path
-        ttk.Label(group_settings, text=self.tr("lbl_save_path")).pack(anchor="w", pady=(10, 0))
-        frame_path = ttk.Frame(group_settings)
+        self.lbl_path = ttk.Label(self.group_settings, text=self.tr("lbl_save_path"))
+        self.lbl_path.pack(anchor="w", pady=(10, 0))
+        frame_path = ttk.Frame(self.group_settings)
         frame_path.pack(fill="x", pady=5)
         
         self.path_var = tk.StringVar(value=self.config.get("save_path"))
@@ -487,26 +493,28 @@ class MainApp(tk.Tk):
         self.btn_browse.pack(side='right', padx=(5, 0))
 
         # Hotkeys Group
-        group_hk = ttk.LabelFrame(self, text=f" {self.tr('lbl_hotkeys')} ", padding=(20, 10))
-        group_hk.pack(fill="x", padx=20, pady=10)
+        self.group_hk = ttk.LabelFrame(self, text=f" {self.tr('lbl_hotkeys')} ", padding=(20, 10))
+        self.group_hk.pack(fill="x", padx=20, pady=10)
 
-        frame_hk_inner = ttk.Frame(group_hk)
+        frame_hk_inner = ttk.Frame(self.group_hk)
         frame_hk_inner.pack(fill="x")
         
         # Grid layout for hotkeys
-        ttk.Label(frame_hk_inner, text=self.tr("lbl_toggle")).grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        self.lbl_hk_toggle = ttk.Label(frame_hk_inner, text=self.tr("lbl_toggle"))
+        self.lbl_hk_toggle.grid(row=0, column=0, sticky="e", padx=5, pady=5)
         self.entry_toggle = ttk.Entry(frame_hk_inner, width=20)
         self.entry_toggle.insert(0, self.config.get("hotkey_toggle"))
         self.entry_toggle.grid(row=0, column=1, padx=5, pady=5)
         self.attach_hotkey_listener(self.entry_toggle)
 
-        ttk.Label(frame_hk_inner, text=self.tr("lbl_stop")).grid(row=1, column=0, sticky="e", padx=5, pady=5)
+        self.lbl_hk_stop = ttk.Label(frame_hk_inner, text=self.tr("lbl_stop"))
+        self.lbl_hk_stop.grid(row=1, column=0, sticky="e", padx=5, pady=5)
         self.entry_stop = ttk.Entry(frame_hk_inner, width=20)
         self.entry_stop.insert(0, self.config.get("hotkey_stop"))
         self.entry_stop.grid(row=1, column=1, padx=5, pady=5)
         self.attach_hotkey_listener(self.entry_stop)
         
-        self.btn_save_hk = ttk.Button(group_hk, text=self.tr("btn_save_hotkeys"), command=self.save_hotkeys)
+        self.btn_save_hk = ttk.Button(self.group_hk, text=self.tr("btn_save_hotkeys"), command=self.save_hotkeys)
         self.btn_save_hk.pack(pady=(10, 0), fill="x")
 
         # Bottom Frame (Startup, Lang, Open)
@@ -540,14 +548,20 @@ class MainApp(tk.Tk):
     def refresh_ui_text(self):
         self.title(self.tr("title_setup"))
         self.status_var.set(self.tr("status_idle")) # Reset status text for simplicity, or check state
+        
+        self.group_controls.config(text=f" {self.tr('lbl_controls')} ")
         self.btn_toggle.config(text=self.tr("btn_toggle"))
         self.btn_stop.config(text=self.tr("btn_stop"))
+        
+        self.group_settings.config(text=f" {self.tr('lbl_settings')} ")
         self.lbl_volume.config(text=self.tr("lbl_volume"))
         self.lbl_path.config(text=self.tr("lbl_save_path"))
         self.btn_browse.config(text=self.tr("btn_browse"))
-        self.lbl_hk_title.config(text=self.tr("lbl_hotkeys"))
+        
+        self.group_hk.config(text=f" {self.tr('lbl_hotkeys')} ")
         self.lbl_hk_toggle.config(text=self.tr("lbl_toggle"))
         self.lbl_hk_stop.config(text=self.tr("lbl_stop"))
+        
         self.btn_save_hk.config(text=self.tr("btn_save_hotkeys"))
         self.cb_startup.config(text=self.tr("chk_startup"))
         self.btn_open.config(text=self.tr("btn_open_folder"))
