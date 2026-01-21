@@ -4,7 +4,7 @@
 
 A ready-to-use local voice recorder for Windows, featuring global hotkeys, minimized system tray recording, and auto-start capabilities.
 
-![Snipaste_2026-01-21_16-32-54](D:\Python\recordVoice\assets\Snipaste_2026-01-21_16-32-54.png)
+![Snipaste](assets/Snipaste_2026-01-21_16-32-54.png)
 
 ## ✨ Features
 
