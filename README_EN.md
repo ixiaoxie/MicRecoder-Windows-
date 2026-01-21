@@ -4,8 +4,7 @@
 
 A lightweight, system-tray based voice recorder for Windows. Features global hotkeys, minimized background recording, and auto-start.
 
-![Screenshot](screenshot.png)
-*(Screenshot placeholder)*
+![400](assets/file-20260121155039488.png)
 
 ## ✨ Features
 
