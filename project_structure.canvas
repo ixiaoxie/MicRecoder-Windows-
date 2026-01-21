@@ -1,0 +1,104 @@
+{
+	"nodes": [
+		{
+			"id": "node_mic_recorder",
+			"x": 0,
+			"y": 0,
+			"width": 250,
+			"height": 60,
+			"type": "text",
+			"text": "# mic_recorder.py\n(Entry Point)"
+		},
+		{
+			"id": "node_main_app",
+			"x": 300,
+			"y": -150,
+			"width": 300,
+			"height": 200,
+			"type": "text",
+			"text": "## MainApp (Tkinter)\n- **GUI Management**\n- **Hotkey Listener** (`attach_hotkey_listener`)\n- **State Display**\n- **Config Binding**"
+		},
+		{
+			"id": "node_audio_recorder",
+			"x": 300,
+			"y": 100,
+			"width": 300,
+			"height": 180,
+			"type": "text",
+			"text": "## AudioRecorder\n- **PyAudio Stream**\n- **Threading** (`_record_loop`)\n- **Pause Logic**\n- **Volume Gain**"
+		},
+		{
+			"id": "node_config",
+			"x": -350,
+			"y": 0,
+			"width": 250,
+			"height": 150,
+			"type": "text",
+			"text": "## ConfigManager\n- Load/Save `config.json`\n- Manage Hotkeys\n- Manage Paths"
+		},
+		{
+			"id": "node_tray",
+			"x": 700,
+			"y": -150,
+			"width": 250,
+			"height": 150,
+			"type": "text",
+			"text": "## TrayIconWrapper\n- **Pystray**\n- System Tray Icon\n- Right-click Menu\n- Notifications"
+		},
+		{
+			"id": "node_startup",
+			"x": -350,
+			"y": 200,
+			"width": 250,
+			"height": 100,
+			"type": "text",
+			"text": "## StartupHandler\n- Windows Registry\n- Auto-start Logic"
+		}
+	],
+	"edges": [
+		{
+			"id": "edge_entry_main",
+			"fromNode": "node_mic_recorder",
+			"fromSide": "right",
+			"toNode": "node_main_app",
+			"toSide": "left"
+		},
+		{
+			"id": "edge_entry_recorder",
+			"fromNode": "node_mic_recorder",
+			"fromSide": "right",
+			"toNode": "node_audio_recorder",
+			"toSide": "left"
+		},
+		{
+			"id": "edge_entry_config",
+			"fromNode": "node_mic_recorder",
+			"fromSide": "left",
+			"toNode": "node_config",
+			"toSide": "right"
+		},
+		{
+			"id": "edge_main_tray",
+			"fromNode": "node_main_app",
+			"fromSide": "right",
+			"toNode": "node_tray",
+			"toSide": "left",
+			"label": "Manages"
+		},
+		{
+			"id": "edge_main_recorder",
+			"fromNode": "node_main_app",
+			"fromSide": "bottom",
+			"toNode": "node_audio_recorder",
+			"toSide": "top",
+			"label": "Calls Start/Stop"
+		},
+		{
+			"id": "edge_config_startup",
+			"fromNode": "node_config",
+			"fromSide": "bottom",
+			"toNode": "node_startup",
+			"toSide": "top"
+		}
+	]
+}

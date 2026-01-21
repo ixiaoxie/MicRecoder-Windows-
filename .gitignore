@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+.venv/
+
+# Distribution / PyInstaller
+dist/
+build/
+# We keep MicRecorder.spec as it is custom modified for this project
+# *.spec
+
+# User Configuration & Data
+config.json
+*.wav
+*.mp3
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+
+# OS Generated
+Thumbs.db
+Desktop.ini
