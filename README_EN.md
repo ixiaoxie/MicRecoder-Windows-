@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | **English**
 
-A ready-to-use local voice recorder for Windows, featuring global hotkeys, minimized system tray recording, and auto-start capabilities.
+A ready-to-use local voice recorder for Windows, featuring global hotkeys, minimized system tray recording, and auto-start capabilities.It is often used in office scenarios where it is necessary to record meetings and leaders' demands at any time.
 
 ![Snipaste](assets/Snipaste_2026-01-21_16-32-54.png)
 
