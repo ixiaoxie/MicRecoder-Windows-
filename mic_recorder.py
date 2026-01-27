@@ -17,7 +17,8 @@ from tkinter import ttk, messagebox, filedialog
 from datetime import datetime
 from pystray import Icon, MenuItem as item, Menu
 from PIL import Image, ImageDraw, ImageTk
-import winreg
+import subprocess
+import winreg # Kept just in case, but unused for startup now
 
 def resource_path(relative_path):
     """
@@ -188,44 +189,71 @@ class ConfigManager:
 # ================= Startup Handler =================
 class StartupHandler:
     """
-    启动项管理器，用于设置 Windows注册表以实现开机自启。
-    Manages Windows Registry for 'Run at Startup' functionality.
+    启动项管理器，用于设置 Windows 任务计划以实现开机自启 (支持管理员权限)。
+    Manages Windows Task Scheduler for 'Run at Startup' functionality with Admin rights.
     """
-    KEY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
-    APP_NAME = "MicRecorder"
+    TASK_NAME = "MicRecorderAutoStart"
 
     @staticmethod
     def set_startup(enable=True):
         try:
-            # Determine command to run
-            if getattr(sys, 'frozen', False):
-                 # Running as PyInstaller EXE
-                cmd = f'"{sys.executable}" --minimized'
-            else:
-                # Running as Script
-                script_path = os.path.abspath(__file__)
-                # Use pythonw.exe if available to avoid console window
-                py_exe = sys.executable
-                if "python.exe" in py_exe:
-                    w_exe = py_exe.replace("python.exe", "pythonw.exe")
-                    if os.path.exists(w_exe):
-                        py_exe = w_exe
-                
-                cmd = f'"{py_exe}" "{script_path}" --minimized'
-
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, StartupHandler.KEY_PATH, 0, winreg.KEY_ALL_ACCESS)
             if enable:
-                winreg.SetValueEx(key, StartupHandler.APP_NAME, 0, winreg.REG_SZ, cmd)
-                print(f"[INFO] Added to startup: {cmd}")
+                # 1. Determine command
+                if getattr(sys, 'frozen', False):
+                    # EXE
+                    app_path = sys.executable
+                    cmd_args = "--minimized"
+                    cwd = os.path.dirname(app_path)
+                else:
+                    # Script
+                    script_path = os.path.abspath(__file__)
+                    cwd = os.path.dirname(script_path)
+                    
+                    # Use pythonw.exe if available
+                    py_exe = sys.executable
+                    if "python.exe" in py_exe:
+                        w_exe = py_exe.replace("python.exe", "pythonw.exe")
+                        if os.path.exists(w_exe):
+                            py_exe = w_exe
+                    
+                    app_path = py_exe
+                    cmd_args = f'\\"{script_path}\\" --minimized'
+
+                # 2. Build Create Command
+                # /SC ONLOGON : Run at login
+                # /RL HIGHEST : Run with highest privileges (Admin)
+                # /F : Force create (overwrite)
+                # /TR : Task run command
+                
+                # Note: schtasks requires proper quoting.
+                # TR command: "\path\to\exe" --arguments
+                tr_cmd = f'\\"{app_path}\\" {cmd_args}'
+                
+                command = (
+                    f'schtasks /Create /TN "{StartupHandler.TASK_NAME}" '
+                    f'/TR "{tr_cmd}" '
+                    f'/SC ONLOGON /RL HIGHEST /F'
+                )
+                
+                # Execute creation
+                # shell=True to hide console window if possible, though we are already in GUI app mostly
+                subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"[INFO] Task Scheduler task created: {StartupHandler.TASK_NAME}")
+                
             else:
-                try:
-                    winreg.DeleteValue(key, StartupHandler.APP_NAME)
-                    print("[INFO] Removed from startup")
-                except FileNotFoundError:
-                    pass
-            winreg.CloseKey(key)
+                # Delete Task
+                command = f'schtasks /Delete /TN "{StartupHandler.TASK_NAME}" /F'
+                subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(f"[INFO] Task Scheduler task deleted: {StartupHandler.TASK_NAME}")
+
+        except subprocess.CalledProcessError:
+            # Often happens if deleting a task that doesn't exist, which is fine.
+            if enable:
+                print(f"[ERROR] Failed to create startup task.")
+            else:
+                print(f"[INFO] Startup task not found or already deleted.")
         except Exception as e:
-            print(f"Startup Registry Error: {e}")
+            print(f"Startup Handler Error: {e}")
 
 # ... (Previous code remains, skipping to Main block) ...
 

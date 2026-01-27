@@ -108,6 +108,12 @@ A: This is the **Silent Startup** feature. The app launches minimized to the Sys
 **Q: Antivirus false positive?**
 A: Because the app uses global keyboard hooks and modifies the registry for startup, some sensitive antivirus software might flag it. Please whitelist it. This project is open source, and you are welcome to audit the code.
 
+**To run the program:** Simply execute `mic_recorder.py`.
+
+**If you encounter icon errors:** Run `convert_icon.py` first to generate the icon file.
+
+**If "Run at Startup" is not working:** Run `verify_startup.py` to check for error messages, or run `debug_env.py` to check the system environment.
+
 ## 📜 License
 
 [MIT License](LICENSE)
